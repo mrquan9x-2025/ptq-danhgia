@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<title>O-Assessment</title>
+    <base target="_top">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      body { background-color: #f0f2f5; padding-top: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+      .container { max-width: 600px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 20px; }
+      .hidden { display: none !important; }
+      
+      /* Style hộp tiêu chí */
+      .criteria-box { background: #fff; border: 1px solid #e9ecef; border-left: 4px solid #0d6efd; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+      .criteria-box.self { border-left-color: #198754; }
+      
+      /* Style header nhóm tiêu chí */
+      .group-header { 
+        background-color: #b1f6fa; padding: 10px 15px; font-weight: bold; text-transform: uppercase; 
+        color: #495057; border-radius: 5px; margin-top: 20px; margin-bottom: 15px; border-left: 4px solid #02abb5; font-size: 0.9rem;
+      }
+      
+      .form-header { text-align: center; margin-bottom: 3px; }     /* Giảm từ 25px xuống 5px để kéo Login Screen lên */
+      .slogan { font-size: 0.85rem; color: #6c757d; font-style: italic; margin-bottom: 2px; text-align: center; } /* margin-bottom - Sát lên trên */
+      
+      .footer-design { text-align: center; font-size: 0.8rem; color: #adb5bd; margin-top: auto; padding-bottom: 20px; }
+      .btn-loading { position: relative; pointer-events: none; opacity: 0.65; }
+      .btn-spinner { display: inline-block; width: 1rem; height: 1rem; vertical-align: text-bottom; border: .2em solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spinner-border .75s linear infinite; margin-right: 5px; }
+      @keyframes spinner-border { to { transform: rotate(360deg); } }
+      .history-stats { font-size: 0.8rem; color: #0dcaf0; margin-top: 8px; padding-top: 5px; border-top: 1px dashed #e9ecef; font-style: italic; }
+      
+      /* Style cho dòng chú thích người đọc */
+      .read-access-note { font-size: 0.75rem; color: #adb5bd; margin-top: 4px; display: block; font-style: italic; }
+      .read-access-note::before { content: "👁️ "; font-style: normal; }
+    
+	/* LOGO */
+.brand-logo-container {
+        text-align: center;        /* Căn giữa logo */
+        padding: 5px 0;           /* Khoảng cách trên dưới */
+        margin: 0 auto;            /* Đảm bảo căn giữa */
+    }
+
+    .brand-logo-link {
+        display: inline-block;     /* Giúp link ôm sát ảnh */
+        text-decoration: none;     /* Bỏ gạch chân link */
+    }
+
+	.brand-logo {
+        height: auto;
+        display: block;
+        margin: 0 auto;
+        
+        /* Giới hạn tối đa 600px trên màn hình lớn */
+        max-width: 600px;
+        
+        /* Trên màn hình lớn, sẽ hiển thị tối đa 600px (không vượt quá) */
+        width: 100%;                   /* Chiếm full nếu nhỏ hơn 600px */
+    }
+
+    /* Responsive cho màn hình trung bình và nhỏ */
+    @media (max-width: 992px) {
+        .brand-logo {
+            max-width: 90%;            /* Vẫn giữ % để co giãn đẹp */
+        }
+    }
+
+    @media (max-width: 768px) {
+        .brand-logo-container {
+            padding: 15px 0;
+        }
+        .brand-logo {
+            max-width: 95%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .brand-logo {
+            max-width: 100%;
+        }
+    }
+	
+	
+	</style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="form-header">
+	  		<!-- LOGO -->
+<div class="brand-logo-container">
+    <img src="https://i.postimg.cc/25GYbBYp/OA.jpg" 
+    alt="HỆ THỐNG ĐÁNH GIÁ OA" 
+    class="brand-logo">
+</div>
+        <h5 id="appTitle" class="text-primary fw-bold mb-0">Hỗ trợ tự đánh giá và đánh giá đồng đẳng</h5>
+        <p id="teacherName" class="text-muted mt-2 small"></p>
+      </div>
+
+      <!-- LOGIN SCREEN -->
+      <div id="loginScreen">
+        <!-- Slogan chỉ hiện ở đây -->
+        <div id="sloganDisplay" class="slogan"></div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Mã Sinh Viên</label>
+          <input type="text" class="form-control" id="masv" placeholder="Nhập mã sinh viên">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Mật khẩu</label>
+          <input type="password" class="form-control" id="password" placeholder="Nhập mật khẩu">
+        </div>
+        
+        <!-- Checkbox Ghi nhớ -->
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="rememberMe">
+          <label class="form-check-label small text-secondary" for="rememberMe">
+            Lưu thông tin đăng nhập
+          </label>
+        </div>
+
+        <button id="btnLogin" onclick="handleLogin()" class="btn btn-primary w-100 py-2 fw-bold shadow-sm mb-2">ĐĂNG NHẬP</button>
+		
+		
+<!-- NÚT MỞ HƯỚNG DẪN (Đặt ở màn hình Login) -->
+<div class="text-center mt-4">
+  <a href="#" onclick="document.getElementById('helpModal').classList.remove('hidden')" class="text-decoration-none small text-secondary d-inline-flex align-items-center">
+    <span style="display:inline-block; width:20px; height:20px; border: 1px solid #999; border-radius: 50%; text-align:center; line-height:18px; margin-right:5px; font-weight:bold;">?</span> 
+    Giới thiệu & Hướng dẫn
+  </a>
+</div>
+
+<!-- MODAL HƯỚNG DẪN (Responsive & Scrollable) -->
+<div id="helpModal" class="hidden" style="position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index: 2000; display: flex; align-items: center; justify-content: center;">
+  
+  <!-- Container: Width 95% cho mobile, Max 500px cho PC -->
+  <div class="container shadow rounded bg-white p-0" style="width: 95%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;">
+    
+    <!-- Header -->
+    <div class="card-header bg-info text-white fw-bold d-flex justify-content-between align-items-center p-3">
+      <span>HƯỚNG DẪN SỬ DỤNG</span>
+      <button onclick="document.getElementById('helpModal').classList.add('hidden')" class="btn btn-sm btn-light rounded-circle fw-bold text-info" style="width:30px; height:30px; padding:0; display:flex; align-items:center; justify-content:center;">✕</button>
+    </div>
+
+    <!-- Body: Có thanh cuộn (Scrollable) -->
+    <div class="card-body p-3" style="overflow-y: auto; flex: 1;">
+      
+      <!-- Mục 1 -->
+      <h6 class="fw-bold text-primary mb-1">1. Mục đích</h6>
+      <p class="small text-muted mb-3">Hệ thống giúp sinh viên rèn luyện kỹ năng đánh giá, tư duy phản biện và tự soi chiếu năng lực thông qua hoạt động Đánh giá đồng đẳng (Peer Review) và Tự đánh giá (Self Review).</p>
+      
+      <!-- Mục 2 -->
+      <h6 class="fw-bold text-primary mb-1">2. Quy trình thực hiện</h6>
+      <ul class="small text-muted mb-3 ps-3">
+          <li class="mb-1"><strong>Đăng nhập:</strong> Dùng Mã SV & Mật khẩu được cấp.</li>
+          <li class="mb-1"><strong>Khán giả:</strong> Chấm điểm nhóm bạn & Góp ý (Thông tin người chấm được <u>Ẩn danh</u>).</li>
+          <li class="mb-1"><strong>Nhóm trình bày:</strong>
+              <ul class="ps-3 mt-1">
+                  <li>Tự chấm điểm sản phẩm của nhóm.</li>
+                  <li>Chấm đóng góp của từng thành viên trong nhóm.</li>
+                  <li><em>Lưu ý: Có tính đến trường hợp thành viên "gánh team".</em></li>
+              </ul>
+          </li>
+      </ul>
+
+      <!-- Mục 3 -->
+      <h6 class="fw-bold text-primary mb-1">3. Xem báo cáo (Feedback)</h6>
+      <p class="small text-muted mb-3">Nhấn nút "Xem kết quả..." để xem biểu đồ so sánh điểm được đánh giá với tự đánh giá và đọc góp ý từ lớp.</p>
+
+      <!-- Mục 4 (MỚI) -->
+      <div class="alert alert-light border border-info mb-0">
+        <h6 class="fw-bold text-dark mb-2" style="font-size: 0.9rem;">4. Kết quả này được sử dụng thế nào?</h6>
+        <p class="small text-muted mb-2 text-justify">
+          <strong>🎓 Với Sinh viên:</strong> Kết quả là "tấm gương" phản chiếu, hỗ trợ tự cải thiện. Hãy đọc kỹ biểu đồ và góp ý để phát huy điểm mạnh, khắc phục điểm yếu.
+        </p>
+        <p class="small text-muted mb-0 text-justify">
+          <strong>📊 Tính điểm học phần:</strong> Giảng viên sẽ dùng dữ liệu để tính điểm của nhóm và điểm từng cá nhân theo các trọng số xác định.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="card-footer text-center p-2 bg-light border-top">
+      <button onclick="document.getElementById('helpModal').classList.add('hidden')" class="btn btn-secondary btn-sm px-4">Đã hiểu</button>
+    </div>
+  </div>
+</div>
+		
+		
+        <div class="text-end">
+          <a href="#" onclick="showChangePass()" class="text-decoration-none small">Đổi mật khẩu?</a>
+        </div>
+        <div id="loginError" class="text-danger mt-3 text-center small"></div>
+      </div>
+
+      <!-- CHANGE PASS SCREEN -->
+      <div id="changePassScreen" class="hidden">
+        <h5 class="text-center text-primary mb-3">ĐỔI MẬT KHẨU</h5>
+        <div class="mb-3"><label class="form-label small fw-bold">Mã Sinh Viên</label><input type="text" class="form-control" id="cp_masv"></div>
+        <div class="mb-3"><label class="form-label small fw-bold">Mật khẩu cũ</label><input type="password" class="form-control" id="oldPass"></div>
+        <div class="mb-3"><label class="form-label small fw-bold">Mật khẩu mới</label><input type="password" class="form-control" id="newPass"></div>
+        <button id="btnChangePass" onclick="doChangePass()" class="btn btn-success w-100 fw-bold">Xác nhận đổi</button>
+        <button onclick="hideChangePass()" class="btn btn-link w-100 mt-2 text-decoration-none">Quay lại</button>
+      </div>
+
+      <!-- FORM SCREEN -->
+      <div id="formScreen" class="hidden">
+        <div class="alert alert-primary shadow-sm">
+          <div class="d-flex justify-content-between">
+             <div>Xin chào: <strong id="uName"></strong></div>
+             <button onclick="location.reload()" class="btn btn-sm btn-light text-primary fw-bold py-0">Thoát</button>
+          </div>
+          <div class="small mt-1">
+             MSV: <span id="uMSV" class="fw-bold"></span> - Lớp: <span id="uClass"></span> | Nhóm: <span id="uGroup"></span>
+         
+        <!-- Nút xem báo cáo (Xanh đậm) -->
+        <div class="text-center mb-3">
+            <button onclick="showReport()" class="btn btn-success shadow-sm fw-bold" style="background-color: #157347; border-color: #146c43;">
+                📊 XEM KẾT QUẢ ĐÁNH GIÁ NHÓM MÌNH
+            </button>
+        </div>
+
+		 </div>
+        </div>
+
+        <div class="text-center mb-3">
+          <span class="badge bg-warning text-dark px-3 py-2 shadow-sm fs-6">
+            Đang đánh giá: Nhóm <span id="targetGroupDisplay" class="fw-bold"></span>
+          </span>
+          <div id="statusBadge" class="mt-2"></div>
+        </div>
+
+
+
+        <div id="dynamicForm"></div>
+
+        <div id="noSession" class="hidden text-center py-5">
+          <h4 class="text-muted">Chưa có phiên đánh giá nào mở.</h4>
+          <p class="text-secondary small">Vui lòng đợi Giảng viên thông báo.</p>
+        </div>
+      </div>
+
+      <!-- SUCCESS SCREEN -->
+      <div id="successScreen" class="hidden text-center py-5">
+        <div class="mb-3 text-success" style="font-size: 60px;">✔</div>
+        <h3 class="text-success fw-bold">Thành công!</h3>
+        <p class="text-muted">Dữ liệu đã được ghi nhận.</p>
+        <button onclick="location.reload()" class="btn btn-outline-primary mt-3 px-4">Quay lại</button>
+      </div>
+    </div>
+
+    <!-- POPUP MODAL BÁO CÁO -->
+    <div id="reportModal" class="hidden" style="position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index: 1000; overflow-y: auto; backdrop-filter: blur(2px);">
+        <div class="container mt-4 mb-5" style="position: relative;">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0 fw-bold">KẾT QUẢ ĐÁNH GIÁ</h5>
+                        <button onclick="closeReport()" class="btn btn-sm btn-light text-primary fw-bold rounded-circle" style="width: 30px; height: 30px; padding: 0;">✕</button>
+                    </div>
+                    <div class="input-group input-group-sm">
+                        <label class="input-group-text bg-white text-primary fw-bold">Chọn xem kết quả:</label>
+                        <select id="reportSessionSelect" class="form-select fw-bold" onchange="changeReportSession()"></select>
+                    </div>
+                </div>
+                <div class="card-body bg-light">
+                    <div class="bg-white p-2 rounded shadow-sm mb-3">
+                        <h6 class="text-center text-uppercase fw-bold text-secondary small pt-2">Biểu đồ tiêu chí (Radar Chart)</h6>
+                        <div style="height: 350px; position: relative;"><canvas id="reportChart"></canvas></div>
+                        <div class="alert alert-light border mt-3 small text-muted" style="font-size: 0.85rem; background-color: #f8f9fa;">
+                            <strong class="text-dark">💡 Giải thích biểu đồ:</strong>
+                            <ul class="mb-0 ps-3 mt-1">
+                                <li>Vùng <span style="color:rgba(255, 99, 132, 1)"><strong>Đỏ</strong></span> bao trùm <span style="color:rgba(54, 162, 235, 1)"><strong>Xanh</strong></span>: Nhóm bạn đang <strong>tự tin thái quá</strong>.</li>
+                                <li>Vùng <span style="color:rgba(54, 162, 235, 1)"><strong>Xanh</strong></span> rộng hơn <span style="color:rgba(255, 99, 132, 1)"><strong>Đỏ</strong></span>: Nhóm bạn <strong>làm tốt hơn bạn nghĩ</strong>.</li>
+                                <li>Hai vùng <strong>trùng khít</strong>: Các bạn <strong>tự nhận thức rất tốt</strong>.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <h6 class="text-primary fw-bold mt-4 border-bottom pb-2">💬 Góp ý từ các nhóm khác (Peer):</h6>
+                    <div id="peerCommentList" class="bg-white p-3 rounded shadow-sm mb-3" style="max-height: 200px; overflow-y: auto;"><div class="text-center"><span class="btn-spinner text-primary"></span></div></div>
+                    <h6 class="text-success fw-bold mt-3 border-bottom pb-2">📝 Tự nhận xét của nhóm (Self):</h6>
+                    <div id="selfCommentList" class="bg-white p-3 rounded shadow-sm" style="max-height: 150px; overflow-y: auto;"></div>
+                </div>
+                <div class="card-footer text-center bg-white"><button onclick="closeReport()" class="btn btn-secondary px-4 fw-bold">Đóng</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER DESIGN -->
+    <div class="footer-design">Design by Phạm Thế Quân</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // ===============================================================
+  // DÁN URL SCRIPT CỦA BẠN VÀO ĐÂY
+  const API_URL = "https://script.google.com/macros/s/AKfycbykuUiEuBtBWAV82C96_W4sNpD0scuyeGFdfskr29WiZA8e0ABPVwEcgN2Eo3cvRSA/exec"; 
+  // ===============================================================
+
+  var GLOBAL_CONFIG = {}; 
+  var CRITERIA_LIST = [];
+  var CURRENT_USER = {};
+  var CURRENT_SESSION = "";
+  var HISTORY_STATS = {}; 
+
+  const SLOGANS = [
+    "Công bằng là chìa khóa để mọi nỗ lực đều được ghi nhận.",
+    "Hãy là tấm gương phản chiếu trung thực nhất cho chính mình và đồng đội.",
+    "Công tâm trong nhận xét, thẳng thắn để vươn xa."
+  ];
+  
+  // INIT
+  window.onload = function() {
+    // 1. Random Slogan
+    var rd = Math.floor(Math.random() * SLOGANS.length);
+    document.getElementById('sloganDisplay').innerText = '"' + SLOGANS[rd] + '"';
+    
+    // 2. Load Remembered User
+    var savedUser = localStorage.getItem("tta_user");
+    var savedPass = localStorage.getItem("tta_pass");
+    if(savedUser && savedPass) {
+        document.getElementById('masv').value = savedUser;
+        document.getElementById('password').value = savedPass;
+        document.getElementById('rememberMe').checked = true;
+    }
+  };
+
+  // HELPER
+  function setBtnLoading(btnId, isLoading) {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    if (isLoading) {
+      if (!btn.getAttribute('data-text')) btn.setAttribute('data-text', btn.innerText);
+      btn.innerHTML = '<span class="btn-spinner"></span> Đang xử lý...';
+      btn.classList.add('btn-loading', 'btn-secondary');
+      btn.classList.remove('btn-primary', 'btn-success');
+    } else {
+      btn.innerHTML = btn.getAttribute('data-text');
+      btn.classList.remove('btn-loading', 'btn-secondary');
+      if(btnId.includes('Self')) btn.classList.add('btn-success');
+      else btn.classList.add('btn-primary');
+    }
+  }
+
+  // --- LOGIN ---
+  function showChangePass() { var loginMSV = document.getElementById('masv').value; if(loginMSV) document.getElementById('cp_masv').value = loginMSV; document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('changePassScreen').classList.remove('hidden'); }
+  function hideChangePass() { document.getElementById('changePassScreen').classList.add('hidden'); document.getElementById('loginScreen').classList.remove('hidden'); }
+  
+  function handleLogin() {
+    var masv = document.getElementById('masv').value;
+    var pass = document.getElementById('password').value;
+    var remember = document.getElementById('rememberMe').checked;
+
+    if(!masv || !pass) { alert("Thiếu thông tin!"); return; }
+    
+    // Xử lý Ghi nhớ
+    if(remember) {
+        localStorage.setItem("tta_user", masv);
+        localStorage.setItem("tta_pass", pass);
+    } else {
+        localStorage.removeItem("tta_user");
+        localStorage.removeItem("tta_pass");
+    }
+
+    setBtnLoading('btnLogin', true);
+    fetch(API_URL + "?action=login&masv=" + masv + "&pass=" + pass)
+      .then(res => res.json())
+      .then(res => { setBtnLoading('btnLogin', false); if(res.error) document.getElementById('loginError').innerText = res.error; else onLoginSuccess(res); })
+      .catch(err => { setBtnLoading('btnLogin', false); alert("Lỗi kết nối!"); });
+  }
+
+  function doChangePass() {
+    var masv = document.getElementById('cp_masv').value;
+    var oldPass = document.getElementById('oldPass').value;
+    var newPass = document.getElementById('newPass').value;
+    if(!masv || !oldPass || !newPass) { alert("Nhập đủ thông tin!"); return; }
+    setBtnLoading('btnChangePass', true);
+    fetch(API_URL, { method: 'POST', body: JSON.stringify({ type: 'change_pass', masv: masv, oldPass: oldPass, newPass: newPass }) })
+      .then(res => res.json()).then(res => { setBtnLoading('btnChangePass', false); if(res.status == 'success') { alert("Đổi mật khẩu thành công!"); hideChangePass(); } else alert(res.message); })
+      .catch(err => { setBtnLoading('btnChangePass', false); alert("Lỗi kết nối!"); });
+  }
+
+  function onLoginSuccess(res) {
+    GLOBAL_CONFIG = res.config;
+    CRITERIA_LIST = res.criteria;
+    CURRENT_USER = res.student;
+    HISTORY_STATS = res.historyStats || {};
+    
+    document.getElementById('appTitle').innerText = GLOBAL_CONFIG.MON_HOC || "HỆ THỐNG ĐÁNH GIÁ";
+    document.getElementById('teacherName').innerText = "Giảng viên: " + (GLOBAL_CONFIG.GIAO_VIEN || "---");
+    
+    document.getElementById('uName').innerText = CURRENT_USER.hoten;
+    document.getElementById('uMSV').innerText = CURRENT_USER.masv; 
+    document.getElementById('uClass').innerText = CURRENT_USER.lop; 
+    document.getElementById('uGroup').innerText = CURRENT_USER.nhom;
+    
+    var currentGroup = GLOBAL_CONFIG.NHOM_DANG_DAY;
+    CURRENT_SESSION = GLOBAL_CONFIG.BUOI_DANG_DAY;
+
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('formScreen').classList.remove('hidden');
+
+    if(!currentGroup) { document.getElementById('noSession').classList.remove('hidden'); return; }
+    document.getElementById('targetGroupDisplay').innerText = currentGroup + " (Buổi " + CURRENT_SESSION + ")";
+
+    var statusDiv = document.getElementById('statusBadge');
+    statusDiv.innerHTML = res.hasReviewed ? '<span class="badge bg-success">✔ Đã đánh giá xong</span>' : '<span class="badge bg-secondary">⚪ Chưa đánh giá</span>';
+
+    if(String(CURRENT_USER.nhom) == String(currentGroup)) renderSelfForm(res.groupMembers, res.hasReviewed);
+    else renderPeerForm(res.hasReviewed);
+  }
+
+  // --- RENDER FORMS (CÓ CHÚ THÍCH NGƯỜI ĐỌC) ---
+  
+  function renderPeerForm(isDisabled) {
+    var html = `<h5 class="mb-3 text-primary border-bottom pb-2">Đánh giá nhóm bạn</h5>`;
+    var lastGroup = "";
+    CRITERIA_LIST.forEach((c, idx) => {
+      if(c.group && c.group != lastGroup) { html += `<div class="group-header">${c.group}</div>`; lastGroup = c.group; }
+      var key = 'tc' + (idx+1); var historyText = "";
+      if(HISTORY_STATS[key]) historyText = `<div class="history-stats">Trung bình các nhóm trước bạn chấm: <strong>${HISTORY_STATS[key]}</strong></div>`;
+      html += `<div class="criteria-box"><label class="fw-bold text-dark">${idx+1}. ${c.title}</label><div class="text-muted small fst-italic mb-2 border-bottom pb-1">${c.desc}</div><div class="d-flex align-items-center justify-content-between"><span class="small fw-bold text-primary">Thang điểm: ${c.max}</span><input type="number" id="tc_${idx+1}" class="form-control border-primary fw-bold text-center" style="width: 100px;" step="0.5" min="0" max="${c.max}" placeholder="0-${c.max}" ${isDisabled ? 'disabled' : ''}></div>${historyText}</div>`;
+    });
+
+    // CHÚ THÍCH NGƯỜI ĐỌC
+    html += `<div class="mb-3 mt-4">
+        <label class="form-label fw-bold">Nhận xét / Góp ý:</label>
+        <textarea class="form-control" id="comment" rows="2" ${isDisabled ? 'disabled' : ''}></textarea>
+        <span class="read-access-note">Giảng viên và thành viên nhóm được nhận xét sẽ đọc được. Nhận xét sẽ được ẩn danh với sinh viên khác.</span>
+    </div>
+    <button id="btnSubmitPeer" onclick="submitForm('peer')" class="btn btn-primary w-100 py-3 fw-bold shadow-sm" ${isDisabled ? 'disabled' : ''}>
+        ${isDisabled ? 'ĐÃ GỬI ĐÁNH GIÁ' : 'GỬI ĐÁNH GIÁ'}
+    </button>`;
+    
+    document.getElementById('dynamicForm').innerHTML = html;
+  }
+
+function renderSelfForm(members, isDisabled) {
+    var html = `<h5 class="mb-3 text-success border-bottom pb-2">Tự đánh giá nhóm mình</h5>`;
+    var lastGroup = "";
+    
+    CRITERIA_LIST.forEach((c, idx) => {
+      // 1. Phân nhóm tiêu chí
+      if(c.group && c.group != lastGroup) { 
+         html += `<div class="group-header" style="border-left-color: #198754;">${c.group}</div>`; 
+         lastGroup = c.group; 
+      }
+      
+      // 2. HIỂN THỊ LỊCH SỬ (MỚI THÊM)
+      var key = 'tc' + (idx+1);
+      var historyText = "";
+      if(HISTORY_STATS[key]) {
+         historyText = `<div class="history-stats">Trung bình các nhóm trước bạn chấm: <strong>${HISTORY_STATS[key]}</strong></div>`;
+      }
+
+      html += `
+        <div class="criteria-box self">
+          <label class="fw-bold text-dark">${idx+1}. ${c.title}</label>
+          <div class="text-muted small fst-italic mb-2 border-bottom pb-1">${c.desc}</div>
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="small fw-bold text-success">Tự chấm (Max ${c.max}):</span>
+            <input type="number" id="tc_${idx+1}" class="form-control border-success fw-bold text-center" 
+                   style="width: 100px;" step="0.5" min="0" max="${c.max}" placeholder="0-${c.max}" ${isDisabled ? 'disabled' : ''}>
+          </div>
+          ${historyText} <!-- Chèn dòng lịch sử vào đây -->
+        </div>`;
+    });
+
+    // CHÚ THÍCH NGƯỜI ĐỌC
+    html += `<div class="mb-3 mt-4">
+        <label class="form-label fw-bold">Điều tâm đắc / Cần cải thiện:</label>
+        <textarea class="form-control" id="comment" rows="2" ${isDisabled ? 'disabled' : ''}></textarea>
+        <span class="read-access-note">Giảng viên và thành viên nhóm bạn sẽ đọc được. Nhận xét sẽ ẩn danh với sinh viên.</span>
+    </div>`;
+    
+    var maxPoint = GLOBAL_CONFIG.DIEM_DONG_GOP_MAX || 10;
+    var maxBonus = GLOBAL_CONFIG.SO_NGUOI_BONUS || 0;
+
+    html += `<div class="mt-4 pt-3 border-top">
+        <div class="alert alert-warning small mb-3">
+            <strong><center>ĐÁNH GIÁ CÁC THÀNH VIÊN TRONG NHÓM</center></strong>
+			<strong>Lưu ý:</strong><br>
+            - Điểm chuẩn: <strong>10</strong> (khi đó, điểm thành viên bằng điểm của nhóm).<br>
+            - Tối đa: <strong>${maxPoint}</strong> điểm. Với thành viên gánh Team.<br>
+            - Tối đa <strong>${maxBonus}</strong> người được điểm trên 10.<br>
+			- Cần viết nhận xét với thành viên có điểm khác 10.
+        </div>
+    `;
+
+    members.forEach(m => {
+      var isMe = (String(m.masv) == String(CURRENT_USER.masv));
+      var val = isMe ? 10 : "";
+      html += `
+        <div class="row mb-2 align-items-center p-2 border rounded bg-white mx-0 shadow-sm">
+          <div class="col-8 ps-1">
+            <span class="fw-bold">${m.hoten}</span><br><small class="text-muted">${m.masv}</small>
+          </div>
+          <div class="col-4 pe-1">
+            <input type="number" class="form-control member-contrib text-center fw-bold border-warning" 
+                   data-masv="${m.masv}" value="${val}" placeholder="0-${maxPoint}" ${isDisabled ? 'disabled' : ''}>
+          </div>
+        </div>
+      `;
+    });
+
+    // CHÚ THÍCH NGƯỜI ĐỌC
+    html += `<div class="mt-2">
+        <textarea class="form-control" id="memberComment" rows="2" placeholder="Nhận xét chi tiết về thành viên..." ${isDisabled ? 'disabled' : ''}></textarea>
+        <span class="read-access-note">Chỉ giảng viên đọc được.</span>
+    </div>
+    <button id="btnSubmitSelf" onclick="submitForm('self')" class="btn btn-success w-100 mt-3 py-3 fw-bold shadow-sm" ${isDisabled ? 'disabled' : ''}>
+        ${isDisabled ? 'ĐÃ GỬI TỰ ĐÁNH GIÁ' : 'GỬI TỰ ĐÁNH GIÁ'}
+    </button></div>`;
+
+    document.getElementById('dynamicForm').innerHTML = html;
+  }
+
+  // --- SUBMIT (Giữ nguyên) ---
+  function submitForm(type) {
+    var btnId = (type == 'peer') ? 'btnSubmitPeer' : 'btnSubmitSelf';
+    var scores = {};
+    for(var i=0; i<CRITERIA_LIST.length; i++) {
+        var el = document.getElementById('tc_' + (i+1));
+        if(!el.value) { alert("Vui lòng nhập đủ điểm các tiêu chí!"); el.focus(); return; }
+        if(Number(el.value) > CRITERIA_LIST[i].max) { alert("Điểm tiêu chí "+(i+1)+" vượt quá giới hạn!"); el.focus(); return; }
+        scores['tc'+(i+1)] = el.value;
+    }
+    var data = { type: type, reviewerId: CURRENT_USER.masv, session: CURRENT_SESSION, scores: scores, comment: document.getElementById('comment').value };
+    if(type == 'peer') {
+        data.targetGroup = document.getElementById('targetGroupDisplay').innerText.split(" ")[0];
+    } else {
+        data.myGroup = CURRENT_USER.nhom;
+        var contribs = []; var bonusCount = 0; var maxPoint = GLOBAL_CONFIG.DIEM_DONG_GOP_MAX || 10; var limitBonus = GLOBAL_CONFIG.SO_NGUOI_BONUS || 0; var inputs = document.querySelectorAll('.member-contrib'); var hasError = false;
+        inputs.forEach(inp => { var val = Number(inp.value); if(inp.value === "" || val < 0 || val > maxPoint) hasError = true; if(val > 10) bonusCount++; contribs.push({ masv: inp.getAttribute('data-masv'), point: val }); });
+        if(hasError) { alert("Điểm thành viên không hợp lệ (0 - "+maxPoint+")"); return; }
+        if(bonusCount > limitBonus) { alert("Vi phạm quy định: Chỉ tối đa "+limitBonus+" người được trên 10 điểm!"); return; }
+        data.contributions = contribs; data.memberComment = document.getElementById('memberComment').value;
+    }
+    setBtnLoading(btnId, true);
+    fetch(API_URL, { method: 'POST', body: JSON.stringify(data) }).then(res => res.json()).then(res => { setBtnLoading(btnId, false); if(res.status == 'success') { document.getElementById('formScreen').classList.add('hidden'); document.getElementById('successScreen').classList.remove('hidden'); } else { alert("Lỗi: " + res.message); } }).catch(err => { setBtnLoading(btnId, false); alert("Lỗi gửi dữ liệu!"); });
+  }
+
+  // --- REPORT LOGIC (Đã sửa bỏ chữ Ẩn danh) ---
+  var myChart = null;
+  function showReport() {
+    document.getElementById('reportModal').classList.remove('hidden');
+    var maxSession = Number(GLOBAL_CONFIG.SO_BUOI) || 2;
+    var select = document.getElementById('reportSessionSelect'); select.innerHTML = "";
+    for(var i=1; i<=maxSession; i++) { var opt = document.createElement('option'); opt.value = i; opt.text = "Buổi " + i; if(i == CURRENT_SESSION) opt.selected = true; select.appendChild(opt); }
+    fetchReportData(select.value);
+  }
+  function changeReportSession() { fetchReportData(document.getElementById('reportSessionSelect').value); }
+  function fetchReportData(sessionVal) {
+    document.getElementById('peerCommentList').innerHTML = '<div class="text-center py-3 text-muted">⏳ Đang tải...</div>';
+    document.getElementById('selfCommentList').innerHTML = '<div class="text-center py-3 text-muted">⏳ Đang tải...</div>';
+    fetch(API_URL, { method: 'POST', body: JSON.stringify({ type: 'get_report', groupId: CURRENT_USER.nhom, session: sessionVal }) }).then(res => res.json()).then(res => { if(res.status == 'success') { renderChart(res.peerMap, res.selfMap); renderCommentsList(res.peerComments, res.selfComments); } else alert("Lỗi tải dữ liệu!"); }).catch(err => console.error(err));
+  }
+  function closeReport() { document.getElementById('reportModal').classList.add('hidden'); }
+  function renderCommentsList(pComments, sComments) {
+    var pHtml = ""; if(!pComments || pComments.length === 0) pHtml = '<p class="text-muted small text-center fst-italic">Chưa có góp ý nào.</p>'; else pComments.forEach(c => { if(c.trim() !== "") pHtml += `<div class="mb-2 pb-2 border-bottom small text-dark">🔹 ${c}</div>`; });
+    document.getElementById('peerCommentList').innerHTML = pHtml;
+    // Đã bỏ chữ (Ẩn danh)
+    var sHtml = ""; if(!sComments || sComments.length === 0) sHtml = '<p class="text-muted small text-center fst-italic">Nhóm chưa tự nhận xét.</p>'; else sComments.forEach(c => { if(c.trim() !== "") sHtml += `<div class="mb-2 pb-2 border-bottom small text-success">🔸 ${c}</div>`; });
+    document.getElementById('selfCommentList').innerHTML = sHtml;
+  }
+  function renderChart(peerMap, selfMap) {
+    var ctx = document.getElementById('reportChart').getContext('2d');
+    var labels = []; var peerData = []; var selfData = [];
+    CRITERIA_LIST.forEach((c, idx) => { var shortTitle = (idx+1) + ". " + c.title.split(' ').slice(0, 3).join(' ') + '..'; labels.push(shortTitle); var key = 'tc' + (idx+1); peerData.push(peerMap[key] || 0); selfData.push(selfMap[key] || 0); });
+    if(myChart) myChart.destroy();
+    myChart = new Chart(ctx, { type: 'radar', data: { labels: labels, datasets: [{ label: 'Được đánh giá (Peer)', data: peerData, backgroundColor: 'rgba(54, 162, 235, 0.2)', borderColor: 'rgba(54, 162, 235, 1)', borderWidth: 2, pointRadius: 0 }, { label: 'Tự đánh giá (Self)', data: selfData, backgroundColor: 'rgba(255, 99, 132, 0.2)', borderColor: 'rgba(255, 99, 132, 1)', borderWidth: 2, pointRadius: 0 }] }, options: { plugins: { legend: { position: 'bottom' }, tooltip: { enabled: false }, datalabels: { display: false } }, scales: { r: { angleLines: { display: true }, suggestedMin: 0, suggestedMax: 10, ticks: { display: false, stepSize: 2 }, pointLabels: { font: { size: 11, weight: 'bold' } } } }, maintainAspectRatio: false } });
+  }
+</script>
+  </body>
+</html>
