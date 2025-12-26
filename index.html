@@ -424,7 +424,7 @@
     html += `<div class="mb-3 mt-4">
         <label class="form-label fw-bold">Nhận xét / Góp ý:</label>
         <textarea class="form-control" id="comment" rows="2" ${isDisabled ? 'disabled' : ''}></textarea>
-        <span class="read-access-note">Giảng viên và thành viên nhóm được nhận xét sẽ đọc được. Nhận xét sẽ được ẩn danh với sinh viên khác.</span>
+        <span class="read-access-note">Giảng viên và thành viên nhóm được nhận xét sẽ đọc được. Nhận xét sẽ được ẩn danh.</span>
     </div>
     <button id="btnSubmitPeer" onclick="submitForm('peer')" class="btn btn-primary w-100 py-3 fw-bold shadow-sm" ${isDisabled ? 'disabled' : ''}>
         ${isDisabled ? 'ĐÃ GỬI ĐÁNH GIÁ' : 'GỬI ĐÁNH GIÁ'}
@@ -468,7 +468,7 @@ function renderSelfForm(members, isDisabled) {
     html += `<div class="mb-3 mt-4">
         <label class="form-label fw-bold">Điều tâm đắc / Cần cải thiện:</label>
         <textarea class="form-control" id="comment" rows="2" ${isDisabled ? 'disabled' : ''}></textarea>
-        <span class="read-access-note">Giảng viên và thành viên nhóm bạn sẽ đọc được. Nhận xét sẽ ẩn danh với sinh viên.</span>
+        <span class="read-access-note">Giảng viên và thành viên nhóm bạn sẽ đọc được. Nhận xét sẽ được ẩn danh.</span>
     </div>`;
     
     var maxPoint = GLOBAL_CONFIG.DIEM_DONG_GOP_MAX || 10;
@@ -476,12 +476,12 @@ function renderSelfForm(members, isDisabled) {
 
     html += `<div class="mt-4 pt-3 border-top">
         <div class="alert alert-warning small mb-3">
-            <strong><center>ĐÁNH GIÁ CÁC THÀNH VIÊN TRONG NHÓM</center></strong>
+            <strong><center>ĐÁNH GIÁ THÀNH VIÊN NHÓM</center></strong>
 			<strong>Lưu ý:</strong><br>
             - Điểm chuẩn: <strong>10</strong> (khi đó, điểm thành viên bằng điểm của nhóm).<br>
             - Tối đa: <strong>${maxPoint}</strong> điểm. Với thành viên gánh Team.<br>
             - Tối đa <strong>${maxBonus}</strong> người được điểm trên 10.<br>
-			- Cần viết nhận xét với thành viên có điểm khác 10.
+			- Nên viết nhận xét với thành viên có điểm khác 10.
         </div>
     `;
 
